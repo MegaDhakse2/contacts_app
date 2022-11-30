@@ -1,4 +1,4 @@
-   import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 
 class AddContacts extends StatefulWidget {
   const AddContacts({Key? key}) : super(key: key);
@@ -8,36 +8,45 @@ class AddContacts extends StatefulWidget {
 }
 
 class _AddContactsState extends State<AddContacts> {
-   static final nameController = TextEditingController();
-   static final mobileNumController = TextEditingController();
-   static final ageController = TextEditingController();
+  static final nameController = TextEditingController();
+  static final mobileNumController = TextEditingController();
+  static final ageController = TextEditingController();
 
+  static List<dynamic> onSavingContactDetails = [];
+  var mapdata = {};
 
-
-  static List<dynamic> contactDetails = [];
-
-
-  onSavePressed()
-  {
+  onSavePressed(BuildContext context) {
     String name = nameController.text;
     int mobile = int.parse(mobileNumController.text);
     int age = int.parse(ageController.text);
 
-    contactDetails.insert(0,name);
-    contactDetails.insert(1,mobile);
-    contactDetails.insert(2,age);
+    mapdata['Name'] = name;
+    mapdata['Mobile'] = mobile;
+    mapdata['Age'] = age;
 
-    print(contactDetails.join('   '));
+    print('data in map $mapdata');
+    print('list on save ${onSavingContactDetails.join('   ')}');
+    print('list before adding mapdata $onSavingContactDetails');
+    onSavingContactDetails.add(mapdata);
+    print('list after adding mapdata $onSavingContactDetails');
 
     nameController.text = '';
     mobileNumController.text = '';
     ageController.text = '';
+
+    Navigator.pop(context, onSavingContactDetails);
   }
+
+  // onSavePressed(BuildContext context){
+  //   String name = nameController.text;
+  //   Navigator.pop(context, name);
+  // }
 
   @override
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
+        resizeToAvoidBottomInset: false,
         appBar: AppBar(
           title: const Text('Add Contacts'),
         ),
@@ -48,32 +57,32 @@ class _AddContactsState extends State<AddContacts> {
               TextFormField(
                 controller: nameController,
                 decoration: const InputDecoration(
-                  hintText:'Enter Name',
+                  hintText: 'Enter Name',
                 ),
-              ),TextFormField(
+              ),
+              TextFormField(
                 controller: mobileNumController,
                 keyboardType: TextInputType.number,
                 decoration: const InputDecoration(
-                  hintText:'Enter Mobile Number',
+                  hintText: 'Enter Mobile Number',
                 ),
-              ),TextFormField(
+              ),
+              TextFormField(
                 controller: ageController,
                 keyboardType: TextInputType.number,
                 decoration: const InputDecoration(
-                  hintText:'Enter Age',
+                  hintText: 'Enter Age',
                 ),
               ),
-
-              const SizedBox( height: 30,),
+              const SizedBox(
+                height: 30,
+              ),
               ElevatedButton(
-                onPressed: ()
-                {
-                  onSavePressed();
+                onPressed: () {
+                  onSavePressed(context);
                 },
                 child: const Text('Save Contact'),
               ),
-              // Container(child: Text(contactDetails.join('   ')),
-
             ],
           ),
         ),
