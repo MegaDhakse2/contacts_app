@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'AddContacts.dart';
 import 'EditContacts.dart';
@@ -65,20 +66,15 @@ class _FirstPage1State extends State<FirstPage1> {
                   final item1 = allMainContact[index]['Mobile']; //doubt final
                   return
                     ListTile(
-                        trailing: IconButton(
-                          onPressed: () {
-                            onEditPressed(index);
-
-                            print('Index onEditPressed $index');
-                            print('contact name onEditPressed $item');
-                            print('contact number onEditPressed $item1');
-                          },
-                          icon: const Icon(
-                            Icons.mode_edit_sharp,
-                            color: Colors.red,
-                            size: 30,
+                        trailing:   IconButton(onPressed: () {
+                          setState(() {
+                            allMainContact.removeAt(index);
+                          });
+                        },
+                          icon: const Icon(Icons.delete, color: CupertinoColors.darkBackgroundGray, size: 30,
                           ),
                         ),
+
                         title: Text(
                           item,
                           style: const TextStyle(
@@ -86,17 +82,34 @@ class _FirstPage1State extends State<FirstPage1> {
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-                        subtitle: Text(
-                          item1.toString(),
-                          style: const TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                          ),
+                        subtitle: Row(
+                          children: [
+                            Text(
+                              item1.toString(),
+                              style: const TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            IconButton(
+                              onPressed: () {
+                                onEditPressed(index);
+
+                                print('Index onEditPressed $index');
+                                print('contact name onEditPressed $item');
+                                print('contact number onEditPressed $item1');
+                              },
+                              icon: const Icon(
+                                Icons.mode_edit_sharp,
+                                color: Colors.red,
+                              ),
+                            ),
+                          ],
                         ),
                       );
-
                 },
               ),
+
             ],
           ),
         ),
