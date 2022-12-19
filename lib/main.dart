@@ -1,16 +1,15 @@
+import 'dart:async';
+import 'package:contacts_app/provider/db_provider.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'AddContacts.dart';
-import 'EditContacts.dart';
+import 'add_contacts.dart';
+import 'edit_contacts.dart';
 
 void main() {
-  runApp(
-    const MaterialApp(
-      title: 'contact',
-      home: FirstPage1(),
-    ),
-  );
+  WidgetsFlutterBinding.ensureInitialized();
+  runApp(const MaterialApp(home: FirstPage(),));
 }
+
 
 class FirstPage extends StatelessWidget {
   const FirstPage({Key? key}) : super(key: key);
@@ -24,16 +23,23 @@ class FirstPage extends StatelessWidget {
 class FirstPage1 extends StatefulWidget {
   const FirstPage1({Key? key}) : super(key: key);
 
+
+
   @override
   State<FirstPage1> createState() => _FirstPage1State();
 }
 
 class _FirstPage1State extends State<FirstPage1> {
-  List<dynamic> allMainContact = [];
-  final savedContact = [];
-  String contactName = '';
-  int contactNumber = 0;
+  List<dynamic> savedContact = [];
+  int mobile = 0;
   List<dynamic> editedContact = [];
+
+  @override
+  void initState() {
+    super.initState();
+    fetchData();
+    print('savedContact is $savedContact');
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -49,9 +55,9 @@ class _FirstPage1State extends State<FirstPage1> {
             children: [
               TextButton(
                   onPressed: () {
-                    displayContacts();
-                    // varContact.clear();
-                    print('list on add contact pressed $allMainContact');
+                    addContacts();
+                    print('list on add contact pressed(savedContact) $savedContact');
+
                   },
                   child: const Text(
                     'Add Contacts +',
@@ -60,16 +66,14 @@ class _FirstPage1State extends State<FirstPage1> {
               ListView.builder(
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
-                itemCount: allMainContact.length,
+                itemCount: savedContact.length,
                 itemBuilder: (context, index) {
-                  final item = allMainContact[index]['Name']; //doubt final
-                  final item1 = allMainContact[index]['Mobile']; //doubt final
+                  final item = savedContact[index]['name']; //doubt final
+                  final item1 = savedContact[index]['mobile']; //doubt final
                   return
                     ListTile(
                         trailing:   IconButton(onPressed: () {
-                          setState(() {
-                            allMainContact.removeAt(index);
-                          });
+                          onDeletePressed(index);
                         },
                           icon: const Icon(Icons.delete, color: CupertinoColors.darkBackgroundGray, size: 30,
                           ),
@@ -94,7 +98,6 @@ class _FirstPage1State extends State<FirstPage1> {
                             IconButton(
                               onPressed: () {
                                 onEditPressed(index);
-
                                 print('Index onEditPressed $index');
                                 print('contact name onEditPressed $item');
                                 print('contact number onEditPressed $item1');
@@ -108,47 +111,77 @@ class _FirstPage1State extends State<FirstPage1> {
                         ),
                       );
                 },
-              ),
-
+              )
             ],
           ),
+
+        ),
+        floatingActionButton: FloatingActionButton(
+          onPressed: () {
+            fetchData();
+          },
+          child: const Icon(Icons.refresh),
         ),
       ),
     );
   }
 
-  Future<void> displayContacts() async {
-    final savedContact =
-        await Navigator.push(context, MaterialPageRoute(builder: (context) {
+  Future<void> addContacts()  async {
+    Navigator.push(context, MaterialPageRoute(builder: (context) {
       return const AddContacts();
-    }));
-    setState(() {
-      allMainContact = savedContact;
-      print('list in setState of contact save $allMainContact');
+    })).then((_) {
+      setState(() {
+        fetchData();
+      });
     });
+    // print('savedContact after initialization is $savedContact');
+
   }
 
+
   Future<void> onEditPressed(int index) async {
+       print('oneditpressed is calling');
+       print('index $index');
+       print(' name before edit ${savedContact[index]['name']}');
     final result =
         await Navigator.push(context, MaterialPageRoute(builder: (context) {
       print('index inside onEditPressed  method $index');
       return EditContacts(
-        nameToEdit: allMainContact[index]['Name'],
-        mobileToEdit: allMainContact[index]['Mobile'],
-        ageToEdit: allMainContact[index]['Age'],
-        contactList: allMainContact,
-        // contactList: allMainContact[index],
+        contactList: savedContact[index],
       );
-    }));
+    })).then((_) {
+      setState(() {
+        fetchData();
+      });
+        });
+
     setState(() {
       editedContact = result;
-      allMainContact[index]['Name'] = editedContact[0];
-      allMainContact[index]['Mobile'] = editedContact[1];
+      savedContact[index]['name'] = editedContact[0];
+      savedContact[index]['mobile'] = editedContact[1];
       print('result(edited contact) is printing inside setState $result');
       print('result\'s first element is printing inside setState ${result[0]}');
       // print(item1);
     });
-
     print('result is printing in on edit method $result');
   }
+
+  void fetchData() async{
+    final db = await DbProvider().initializeDB();
+    savedContact = await db.query('contactDetails');
+    print(savedContact.length);
+    print('this is db(savedContact) $savedContact');
+    setState(() { });
+  }
+
+  void onDeletePressed(int index) async {
+    final db = await DbProvider().initializeDB();
+    mobile = savedContact[index]['mobile'];
+    db.delete('contactDetails',
+    where: 'mobile = ?',
+      whereArgs: [mobile],
+    );
+    fetchData();
+  }
 }
+

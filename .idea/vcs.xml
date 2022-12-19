@@ -4,5 +4,7 @@
     <mapping directory="" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/NamedNavigationRoutes" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/contacts_app" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/contacts_app/contacts_app" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/lib/contacts_app" vcs="Git" />
   </component>
 </project>

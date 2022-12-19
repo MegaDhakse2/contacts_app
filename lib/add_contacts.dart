@@ -1,7 +1,11 @@
+
+import 'package:contacts_app/provider/db_provider.dart';
+import 'package:sqflite/sqflite.dart';
+import 'dart:async';
 import 'package:flutter/material.dart';
 
 class AddContacts extends StatefulWidget {
-  const AddContacts({Key? key}) : super(key: key);
+  const AddContacts({Key? key, }) : super(key: key);
 
   @override
   State<AddContacts> createState() => _AddContactsState();
@@ -12,35 +16,39 @@ class _AddContactsState extends State<AddContacts> {
   static final mobileNumController = TextEditingController();
   static final ageController = TextEditingController();
 
-  static List<dynamic> onSavingContactDetails = [];
-  var mapdata = {};
 
-  onSavePressed(BuildContext context) {
-    String name = nameController.text;
-    int mobile = int.parse(mobileNumController.text);
+  static List<dynamic> onSavingContactDetails = [];
+  onSavePressed(BuildContext context) async{
+     String name = nameController.text;
+     int mobile = int.parse(mobileNumController.text);
     int age = int.parse(ageController.text);
+    var mapdata = {};
 
     mapdata['Name'] = name;
     mapdata['Mobile'] = mobile;
     mapdata['Age'] = age;
 
-    print('data in map $mapdata');
-    print('list on save ${onSavingContactDetails.join('   ')}');
+
+       var contact = ContactDetails( name:name, mobile: mobile, age: age);
+     await DbProvider().insertData(contact);
+     print('all database objects here ${await DbProvider().displayAllDBData()}');
+
+    print('data in mapdata $mapdata');
+    print('list onSavingContactDetails ${onSavingContactDetails.join('   ')}');
     print('list before adding mapdata $onSavingContactDetails');
     onSavingContactDetails.add(mapdata);
-    print('list after adding mapdata $onSavingContactDetails');
+    print('list after adding mapdata to onSavingContactDetails $onSavingContactDetails');
 
     nameController.text = '';
     mobileNumController.text = '';
     ageController.text = '';
 
-    Navigator.pop(context, onSavingContactDetails);
+    // if(!context.) return;
+    Navigator.pop(context);
+     print('list onSavingContactDetails is $onSavingContactDetails');
   }
 
-  // onSavePressed(BuildContext context){
-  //   String name = nameController.text;
-  //   Navigator.pop(context, name);
-  // }
+
 
   @override
   Widget build(BuildContext context) {
@@ -83,6 +91,7 @@ class _AddContactsState extends State<AddContacts> {
                 },
                 child: const Text('Save Contact'),
               ),
+
             ],
           ),
         ),
